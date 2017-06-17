@@ -21,6 +21,8 @@ import os.path, sys
 if (sys.platform == 'win32'):
     from win32api import GetVolumeInformation
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidgetItem
 
 # if (sys.platform == 'win32'):
 #     import win32api
@@ -127,6 +129,33 @@ if (sys.platform == 'win32'):
 
 
 
+
+def AddItemToTableWidgetCell(tableWidget, row, column, value, data=None,
+    readOnly=False, textAlignment=(Qt.AlignRight | Qt.AlignBottom)):
+    """ Create and add a QTableWidgetItem to a QTableWidget cell.
+
+        The value parameter is attached as setData(Qt.EditRole).
+        The data parameter is attached as setData(Qt.UserRole).
+
+        The Qt.ItemIsEditable flag is cleared if the readOnly parameter is True.
+
+        Returns the item that was created.
+    """
+
+    item = QTableWidgetItem()
+    if (value is not None):
+        item.setData(Qt.EditRole, value)
+    if (data is not None):
+        item.setData(Qt.UserRole, data)
+    if (textAlignment is not None):
+        item.setTextAlignment(textAlignment)
+    if (readOnly):
+        item.setFlags(item.flags() & ~Qt.ItemIsEditable)
+
+    tableWidget.setItem(row, column, item)
+
+    return item
+
 def GetVolumeLabel(path):
     """ Returns the volume label for a given path.
 
@@ -135,7 +164,7 @@ def GetVolumeLabel(path):
         function is called and the platform is not 'win32'.
     """
 
-    # TODO Not really Qt5.  Move to PyHelpers or maybe PyWinHelpers 
+    # TODO Not really Qt5.  Move to PyHelpers or maybe PyWinHelpers
 
     if (sys.platform != 'win32'):
         raise RuntimeError('Method GetVolueLabel(path) was called but the OS is not Windows.')
