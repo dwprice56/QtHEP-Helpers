@@ -25,12 +25,14 @@
 
 from collections import MutableSequence
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QCheckBox,
     QComboBox,
     QLineEdit,
     QPlainTextEdit,
     QRadioButton,
-    QSpinBox)
+    QSpinBox,
+    QTableWidgetItem)
 
 class AbstractWidgetMutableDataConnector(object):
     """ Base class for all other connectors.
@@ -322,6 +324,35 @@ class QSpinBoxDataConnector(AbstractWidgetImmutableDataConnector):
         assert(isinstance(dataItem, int))
 
         super(QSpinBoxDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+
+class QTableWidgetItemDataConnector(AbstractWidgetImmutableDataConnector):
+    """ A connectors that transfers a value to/from a QTableWidgetItem.
+    """
+
+    def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
+        super(QTableWidgetItemDataConnector, self).__init__(groupFlags)
+
+        self.connect(widget, mutableDataItem, attributeName, groupFlags)
+
+    def _transferToWidget(self):
+        """ Virtual method for transferring data from the dataItem to the widget.
+            Must be overridden in the child classes.
+        """
+        dataItem = getattr(self._mutableDataItem, self._attributeName)
+        self._widget.setData(Qt.DisplayRole, dataItem)
+
+    def _transferFromWidget(self):
+        """ Virtual method for transferring data from the widget to the dataItem.
+            Must be overridden in the child classes.
+        """
+        setattr(self._mutableDataItem, self._attributeName, self._widget.data(Qt.DisplayRole))
+
+    def connect(self, widget, mutableDataItem, attributeName, groupFlags=0):
+        """ Connect the widget to the dataItem.  This should be overridden in
+            the child classes to check the widget type.
+        """
+        assert(isinstance(widget, QTableWidgetItem))
+        super(QTableWidgetItemDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class WidgetDataConnectors(MutableSequence):
     """ Contains a list widget/data connectors.
