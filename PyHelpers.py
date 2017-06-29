@@ -16,7 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unicodedata
+import os.path, sys, unicodedata
+if (sys.platform == 'win32'):
+    from win32api import GetVolumeInformation
 
 BAD_FILENAME_CHARACTERS = "|^?*<>[]=+\"\\/,:;"
 
@@ -40,3 +42,16 @@ def NormalizeFileName(filename):
     cleanFilename = ''.join(c for c in cleanFilename if c not in BAD_FILENAME_CHARACTERS)
 
     return cleanFilename
+
+def GetVolumeLabel(path):
+    """ Returns the volume label for a given path.
+
+        This only works under Windows.  Linux does really have disk volumes, so
+        it doesn't have volume labels.  An RuntimeError is raised if this
+        function is called and the platform is not 'win32'.
+    """
+    if (sys.platform != 'win32'):
+        raise RuntimeError('Method GetVolueLabel(path) was called but the OS is not Windows.')
+
+    drive, tail = os.path.splitdrive(self.dirpickerctrlSource.GetPath().strip())
+    return GetVolumeInformation(drive)[0]

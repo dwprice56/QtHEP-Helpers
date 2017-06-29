@@ -18,9 +18,6 @@
 
 import os.path, sys
 
-if (sys.platform == 'win32'):
-    from win32api import GetVolumeInformation
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTableWidgetItem
 
@@ -127,9 +124,6 @@ from PyQt5.QtWidgets import QTableWidgetItem
 #     return stat.f_bfree*stat.f_bsize
 # Some sample pathnames on my computer:
 
-
-
-
 def AddItemToTableWidgetCell(tableWidget, row, column, value, data=None,
     readOnly=False, textAlignment=(Qt.AlignRight | Qt.AlignBottom)):
     """ Create and add a QTableWidgetItem to a QTableWidget cell.
@@ -155,22 +149,6 @@ def AddItemToTableWidgetCell(tableWidget, row, column, value, data=None,
     tableWidget.setItem(row, column, item)
 
     return item
-
-def GetVolumeLabel(path):
-    """ Returns the volume label for a given path.
-
-        This only works under Windows.  Linux does really have disk volumes, so
-        it doesn't have volume labels.  An RuntimeError is raised if this
-        function is called and the platform is not 'win32'.
-    """
-
-    # TODO Not really Qt5.  Move to PyHelpers or maybe PyWinHelpers
-
-    if (sys.platform != 'win32'):
-        raise RuntimeError('Method GetVolueLabel(path) was called but the OS is not Windows.')
-
-        drive, tail = os.path.splitdrive(self.dirpickerctrlSource.GetPath().strip())
-        return win32api.GetVolumeInformation(drive)[0]
 
 def SetTextComboBoxSelection(comboBox, text):
     """ Selects an item a QComboBox, if it's present.

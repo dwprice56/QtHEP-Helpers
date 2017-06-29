@@ -53,8 +53,6 @@ class AbstractWidgetMutableDataConnector(object):
         self._mutableDataItem = None
         self._groupFlags = groupFlags
 
-        # TODO @abstactmethod
-
     def _transferToWidget(self):
         """ Virtual method for transferring data from the dataItem to the widget.
             Must be overridden in the child classes.

@@ -16,6 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import datetime, os, subprocess, sys
+
 class SingletonLog(object):
     """Write log messages to a file.  This is implements the singlton pattern
     so only one log exists in the application."""
@@ -42,8 +44,8 @@ class SingletonLog(object):
         self.__close()
 
     def __close(self):
-        """Flush and close the log file."""
-
+        """ Flush and close the log file.
+        """
         # If the log file exists then it's open.
         if (self.logFile is not None):
             self.logFile.flush()
@@ -51,10 +53,11 @@ class SingletonLog(object):
             self.logFile = None
 
     def __open(self, logFilename):
-        """Only open (or re-open) the log file if the name changes.
+        """ Only open (or re-open) the log file if the name changes.
 
-        If the logFilename parameter is None any existing log file will be closed."""
-
+            If the logFilename parameter is None any existing log file will be
+            closed.
+        """
         if (logFilename != self.logFilename):
             self.__close()
             self.logFilename = logFilename
@@ -63,7 +66,8 @@ class SingletonLog(object):
             self.logFile = open(self.logFilename, 'a')
 
     def clear(self):
-        """Empty the log file."""
+        """ Empty the log file.
+        """
         assert(self.logFilename is not None)
 
         self.logFile.close()
@@ -72,35 +76,47 @@ class SingletonLog(object):
         self.logFile = open(self.logFilename, 'a')
 
     def close(self):
-        """Close a log file."""
-
+        """ Close a log file.
+        """
         self.__close()
 
     def open(self, logFilename):
-        """Open a log file.
+        """ Open a log file.
 
-        This will close the old log file (if present) and open the new log file.
-        Nothing will happen if the file name dosen't change."""
-
+            This will close the old log file (if present) and open the new log
+            file. Nothing will happen if the file name dosen't change.
+        """
         self.__open(logFilename)
 
+    def view(self):
+        """ Open the log file in the default text file viewer.
+        """
+        assert(self.logFilename is not None)
+
+        if (sys.platform == 'linux'):
+            subprocess.call(('xdg-open', self.logFilename))
+        elif (sys.platform == 'win32'):
+            os.startfile(self.logFilename, 'open')
+        else:
+            raise RuntimeError('Unknown platform "{}" found in SingletonLog.view().'.format(sys.platform))
+
     def write(self, someText):
-        """Write something to the log file.
+        """ Write something to the log file.
 
-        A log file might not exist.  It depends on the user preferences."""
-
+            A log file might not exist.  It depends on the user preferences.
+        """
         if (self.logFile is not None):
             self.logFile.write(someText)
             self.logFile.flush()
 
-    def writeline(self, someText):
-        """Write a line of text to the log file.
+    def writeline(self, someText, timestamp=True):
+        """ Write a line of text to the log file.
 
-        A log file might not exist.  It depends on the user preferences."""
-
-        # TODO add an optional timestamp
-
+            A log file might not exist.  It depends on the user preferences.
+        """
         if (self.logFile is not None):
+            if (timestamp):
+                self.write('{}:  '.format(str(datetime.datetime.now())))
             self.write(someText)
             self.write('\n')
             self.logFile.flush()
