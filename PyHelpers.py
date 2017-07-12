@@ -55,3 +55,16 @@ def GetVolumeLabel(path):
 
     drive, tail = os.path.splitdrive(self.dirpickerctrlSource.GetPath().strip())
     return GetVolumeInformation(drive)[0]
+
+def TimedeltaToString(td, noZeroDays=True):
+    """ Based on an answer found ton stackoverflow.
+    """
+    if (td.days > 0):
+        out = str(td).replace(" days, ", ":")
+    else:
+        if (not noZeroDays):
+            out = "0:" + str(td)
+    outAr = out.split(':')
+    outAr = ["%02d" % (int(float(x))) for x in outAr]
+    out   = ":".join(outAr)
+    return out

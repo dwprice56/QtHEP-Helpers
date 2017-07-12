@@ -66,8 +66,8 @@ class QOverrideCursor(object):
 
 class QBusyCursor(QOverrideCursor):
     def __init__(self):
-        super(QBusyCursor, self).__init__(Qt.BusyCursor)
+        super().__init__(Qt.BusyCursor)
 
 class QWaitCursor(QOverrideCursor):
     def __init__(self):
-        super(QWaitCursor, self).__init__(Qt.WaitCursor)
+        super().__init__(Qt.WaitCursor)

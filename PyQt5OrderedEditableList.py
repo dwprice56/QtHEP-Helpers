@@ -18,10 +18,10 @@
 
 import copy
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtWidgets import QListWidgetItem
 
-class QOrderedEditableList(object):
+class QOrderedEditableList(QObject):
     """ A class that connects methods to buttons that will do the following
         actions to a QListWidget:
 
@@ -45,11 +45,17 @@ class QOrderedEditableList(object):
         because it's asynchronous.  New list items are automatically selected
         and the new item's initialization must be complete before it's selected.
         The signal/slot mechanism can't guarantee that.
+
+        However, a Qt5 signal named listChanged is emitted whenever a button is
+        used to modify the list (add, copy, delete; move up, down, top, bottom).
     """
+
+    listChanged = pyqtSignal()
 
     def __init__(self, parent, listWidget, newItemButton, copyItemButton, deleteItemButton,
         itemTopButton, itemUpButton, itemDownButon, itemBottomButton, newItemDefaultString,
         onNewListItem = None):
+        super().__init__(parent)
 
         self.__parent = parent
 
@@ -64,18 +70,18 @@ class QOrderedEditableList(object):
         self.__newItemDefaultString = newItemDefaultString
         self._onNewListItem = onNewListItem
 
-        self.__listWidget.itemSelectionChanged.connect(self.EnableButtons)
+        self.__listWidget.itemSelectionChanged.connect(self.enableButtons)
 
-        self.__newItemButton.clicked.connect(self.__ItemNew)
-        self.__copyItemButton.clicked.connect(self.__ItemCopy)
-        self.__deleteItemButton.clicked.connect(self.__ItemDelete)
+        self.__newItemButton.clicked.connect(self.__itemNew)
+        self.__copyItemButton.clicked.connect(self.__itemCopy)
+        self.__deleteItemButton.clicked.connect(self.__itemDelete)
 
-        self.__itemTopButton.clicked.connect(self.__ItemMoveTop)
-        self.__itemUpButton.clicked.connect(self.__ItemMoveUp)
-        self.__itemDownButon.clicked.connect(self.__ItemMoveDown)
-        self.__itemBottomButton.clicked.connect(self.__ItemMoveBottom)
+        self.__itemTopButton.clicked.connect(self.__itemMoveTop)
+        self.__itemUpButton.clicked.connect(self.__itemMoveUp)
+        self.__itemDownButon.clicked.connect(self.__itemMoveDown)
+        self.__itemBottomButton.clicked.connect(self.__itemMoveBottom)
 
-        self.EnableButtons()
+        self.enableButtons()
 
     def __closePersistentEditor(self):
         """ Make sure the persistent editor is closed.  It really screws things
@@ -86,7 +92,7 @@ class QOrderedEditableList(object):
         if (currentItem is not None):
             self.__listWidget.closePersistentEditor(currentItem)
 
-    def EnableButtons(self):
+    def enableButtons(self):
         """ Enable/disable the buttons based on the contents of the listWidget.
         """
 
@@ -113,8 +119,8 @@ class QOrderedEditableList(object):
         self.__itemDownButon.setEnabled(currentRow + 1 < count)
         self.__itemBottomButton.setEnabled(currentRow + 1 < count)
 
-    def __ItemCopy(self):
-        """ Add a copy of the selete item to the end of the list.  Select the
+    def __itemCopy(self):
+        """ Add a copy of the selected item to the end of the list.  Select the
             copy item and start editing it.
         """
         self.__closePersistentEditor()
@@ -132,10 +138,11 @@ class QOrderedEditableList(object):
         self.__listWidget.setCurrentItem(item)
         self.__listWidget.editItem(item)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()
 
-    def __ItemDelete(self):
-        """ Add a copy of the selete item to the end of the list.  Select the
+    def __itemDelete(self):
+        """ Add a copy of the selected item to the end of the list.  Select the
             copy item and start editing it.
         """
         self.__closePersistentEditor()
@@ -159,9 +166,10 @@ class QOrderedEditableList(object):
         item.setSelected(True)
         self.__listWidget.setCurrentItem(item)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()
 
-    def __ItemMoveBottom(self):
+    def __itemMoveBottom(self):
         """ Move the selected item to the bottom of the list.
         """
         self.__closePersistentEditor()
@@ -174,9 +182,10 @@ class QOrderedEditableList(object):
         self.__listWidget.setCurrentItem(item)
         item.setSelected(True)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()
 
-    def __ItemMoveDown(self):
+    def __itemMoveDown(self):
         """ Move the selected item down one position in the list.
         """
         self.__closePersistentEditor()
@@ -189,9 +198,10 @@ class QOrderedEditableList(object):
         self.__listWidget.setCurrentItem(item)
         item.setSelected(True)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()
 
-    def __ItemMoveTop(self):
+    def __itemMoveTop(self):
         """ Move the selected item to the top of the list.
         """
         self.__closePersistentEditor()
@@ -204,9 +214,10 @@ class QOrderedEditableList(object):
         self.__listWidget.setCurrentItem(item)
         item.setSelected(True)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()
 
-    def __ItemMoveUp(self):
+    def __itemMoveUp(self):
         """ Move the selected item up one position in the list.
         """
         self.__closePersistentEditor()
@@ -219,9 +230,10 @@ class QOrderedEditableList(object):
         self.__listWidget.setCurrentItem(item)
         item.setSelected(True)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()
 
-    def __ItemNew(self):
+    def __itemNew(self):
         """ Add a new, default item to the end of the list.  Select the item
             and start editing it.
         """
@@ -237,4 +249,5 @@ class QOrderedEditableList(object):
         self.__listWidget.setCurrentItem(item)
         self.__listWidget.editItem(item)
 
-        self.EnableButtons()
+        self.enableButtons()
+        self.listChanged.emit()

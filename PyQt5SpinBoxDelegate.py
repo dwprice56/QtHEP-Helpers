@@ -31,7 +31,7 @@ from PyQt5.QtWidgets import (QStyledItemDelegate,
 
 class SpinBoxDelegate(QStyledItemDelegate):
     def __init__(self, parent=None, minimum=0, maximum=100):
-        super(SpinBoxDelegate, self).__init__(parent)
+        super().__init__(parent)
 
         self.minimum = minimum
         self.maximum = maximum

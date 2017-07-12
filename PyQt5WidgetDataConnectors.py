@@ -39,8 +39,8 @@ class AbstractWidgetMutableDataConnector(object):
 
         The data item must be of a mutable type.
 
-        The groupFlags may be set to control the TransferToWindow(),
-        TransferFromWindow() methods.  When supplied, only the controls
+        The groupFlags may be set to control the transferToWindow(),
+        transferFromWindow() methods.  When supplied, only the controls
         with matching groups will be transfered.
     """
 
@@ -80,8 +80,8 @@ class AbstractWidgetMutableDataConnector(object):
         return (groupFlags & self._groupFlags)
 
     def setGroupFlags(self, groupFlags):
-        """ The groupFlags may be set to control the TransferToWindow(),
-            TransferFromWindow() methods.  When supplied, only the controls
+        """ The groupFlags may be set to control the transferToWindow(),
+            transferFromWindow() methods.  When supplied, only the controls
             with matching groups will be transfered.
         """
         self._groupFlags = groupFlags
@@ -93,7 +93,7 @@ class AbstractWidgetImmutableDataConnector(AbstractWidgetMutableDataConnector):
     """
 
     def __init__(self, groupFlags=0):
-        super(AbstractWidgetImmutableDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self._attributeName = None
 
@@ -101,7 +101,7 @@ class AbstractWidgetImmutableDataConnector(AbstractWidgetMutableDataConnector):
         """ Connect the widget to the dataItem.  This should be overridden in
             the child classes to check the widget type.
         """
-        super(AbstractWidgetImmutableDataConnector, self).connect(widget, mutableDataItem, groupFlags)
+        super().connect(widget, mutableDataItem, groupFlags)
         self._attributeName = attributeName
 
 class QCheckBoxDataConnector(AbstractWidgetImmutableDataConnector):
@@ -109,7 +109,7 @@ class QCheckBoxDataConnector(AbstractWidgetImmutableDataConnector):
     """
 
     def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
-        super(QCheckBoxDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widget, mutableDataItem, attributeName, groupFlags)
 
@@ -134,14 +134,14 @@ class QCheckBoxDataConnector(AbstractWidgetImmutableDataConnector):
         dataItem = getattr(mutableDataItem, attributeName)
         assert(isinstance(dataItem, bool))
 
-        super(QCheckBoxDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+        super().connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class QComboBoxDataConnector(AbstractWidgetImmutableDataConnector):
     """ A connectors that transfers a boolean attribute to/from a QComboBox.
     """
 
     def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
-        super(QComboBoxDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widget, mutableDataItem, attributeName, groupFlags)
 
@@ -173,14 +173,14 @@ class QComboBoxDataConnector(AbstractWidgetImmutableDataConnector):
         dataItem = getattr(mutableDataItem, attributeName)
         assert(isinstance(dataItem, str))
 
-        super(QComboBoxDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+        super().connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class QLineEditDataConnector(AbstractWidgetImmutableDataConnector):
     """ A connectors that transfers a boolean attribute to/from a QLineEdit.
     """
 
     def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
-        super(QLineEditDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widget, mutableDataItem, attributeName, groupFlags)
 
@@ -205,14 +205,14 @@ class QLineEditDataConnector(AbstractWidgetImmutableDataConnector):
         dataItem = getattr(mutableDataItem, attributeName)
         assert(isinstance(dataItem, str))
 
-        super(QLineEditDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+        super().connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class QPlainTextEditDataConnector(AbstractWidgetImmutableDataConnector):
     """ A connectors that transfers a boolean attribute to/from a QPlainTextEdit.
     """
 
     def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
-        super(QPlainTextEditDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widget, mutableDataItem, attributeName, groupFlags)
 
@@ -237,16 +237,16 @@ class QPlainTextEditDataConnector(AbstractWidgetImmutableDataConnector):
         dataItem = getattr(mutableDataItem, attributeName)
         assert(isinstance(dataItem, str))
 
-        super(QPlainTextEditDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+        super().connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class QRadioButtonGroupDataConnector(AbstractWidgetImmutableDataConnector):
     """ A connectors that uses a data attribute to set an entry in a list
         of QRadioButtons.
 
         The connector uses a list of QRadioButtons and a matching list values.
-        In TransferToWindow() the list of values is searched for a value that
+        In transferToWindow() the list of values is searched for a value that
         matches the data item; the corresponding QRadioButton is set.  In
-        TransferFromWindow() the list of QRadioButtons is searched for the one
+        transferFromWindow() the list of QRadioButtons is searched for the one
         that's set; the data item is set to the corresponding value.
 
         The self.widget attribute will be None because it's not used; this
@@ -254,7 +254,7 @@ class QRadioButtonGroupDataConnector(AbstractWidgetImmutableDataConnector):
     """
 
     def __init__(self, widgetList, valueList, mutableDataItem, attributeName, groupFlags=0):
-        super(QRadioButtonGroupDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widgetList, valueList, mutableDataItem, attributeName, groupFlags)
 
@@ -287,7 +287,7 @@ class QRadioButtonGroupDataConnector(AbstractWidgetImmutableDataConnector):
         for widget in widgetList:
             assert(isinstance(widget, QRadioButton))
 
-        super(QRadioButtonGroupDataConnector, self).connect(None, mutableDataItem, attributeName, groupFlags)
+        super().connect(None, mutableDataItem, attributeName, groupFlags)
         self._widgetList = widgetList
         self._valueList = valueList
 
@@ -296,7 +296,7 @@ class QSpinBoxDataConnector(AbstractWidgetImmutableDataConnector):
     """
 
     def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
-        super(QSpinBoxDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widget, mutableDataItem, attributeName, groupFlags)
 
@@ -321,14 +321,14 @@ class QSpinBoxDataConnector(AbstractWidgetImmutableDataConnector):
         dataItem = getattr(mutableDataItem, attributeName)
         assert(isinstance(dataItem, int))
 
-        super(QSpinBoxDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+        super().connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class QTableWidgetItemDataConnector(AbstractWidgetImmutableDataConnector):
     """ A connectors that transfers a value to/from a QTableWidgetItem.
     """
 
     def __init__(self, widget, mutableDataItem, attributeName, groupFlags=0):
-        super(QTableWidgetItemDataConnector, self).__init__(groupFlags)
+        super().__init__(groupFlags)
 
         self.connect(widget, mutableDataItem, attributeName, groupFlags)
 
@@ -350,14 +350,14 @@ class QTableWidgetItemDataConnector(AbstractWidgetImmutableDataConnector):
             the child classes to check the widget type.
         """
         assert(isinstance(widget, QTableWidgetItem))
-        super(QTableWidgetItemDataConnector, self).connect(widget, mutableDataItem, attributeName, groupFlags)
+        super().connect(widget, mutableDataItem, attributeName, groupFlags)
 
 class WidgetDataConnectors(MutableSequence):
     """ Contains a list widget/data connectors.
     """
 
     def __init__(self):
-        super(WidgetDataConnectors, self).__init__()
+        super().__init__()
 
         self.connectors = []
 

@@ -108,6 +108,7 @@ class QRecentFiles(object):
                     self.windowTitle))
             else:
                 self.setWindowTitle(self.windowTitle)
+                return
 
         settings = QSettings()
         files = settings.value('recentFileList', [])

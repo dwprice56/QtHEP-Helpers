@@ -118,7 +118,7 @@ class QWidget_Abstract_Validator(object):
             The default behavior is to set the background color using a style sheet.
         """
 
-        if (self._preExistingStyle == 0):
+        if (not self._preExistingStyle):
             self._preExistingStyle = self._widget.styleSheet()
         self._widget.setStyleSheet(ERROR_BACKGROUND_STYLE)
 
@@ -129,14 +129,14 @@ class QLineEditor_Abstract_Validator(QWidget_Abstract_Validator):
     __DEFAULT_MESSAGE = 'There is an error in the hightlighted field.'
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QLineEditor_Abstract_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def connect(self, widget):
         """ Connect the QLineEdit widget to the validator.
         """
         assert(isinstance(widget, QLineEdit))
 
-        super(QLineEditor_Abstract_Validator, self).connect(widget)
+        super().connect(widget)
 
     def setErrorMessage(self, message):
         """ Set the error box message that will be displayed when the field is
@@ -158,7 +158,7 @@ class QLineEdit_ExecutableExists_Validator(QLineEditor_Abstract_Validator):
     __DEFAULT_MESSAGE = 'The highlighted field is either blank or does not point to a valid executble.'
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QLineEdit_ExecutableExists_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def isValid(self):
         """ The field is valid if:
@@ -204,7 +204,7 @@ class QLineEdit_FileExists_Validator(QLineEditor_Abstract_Validator):
     __DEFAULT_MESSAGE = 'The highlighted field is either blank or does not point to a valid file.'
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QLineEdit_FileExists_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def isValid(self):
         """ The field is valid if:
@@ -245,7 +245,7 @@ class QLineEdit_FolderExists_Validator(QLineEditor_Abstract_Validator):
     __DEFAULT_MESSAGE = 'The highlighted field is either blank or does not point to a valid folder.'
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QLineEdit_FolderExists_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def isValid(self):
         """ The field is valid if:
@@ -288,7 +288,7 @@ class QLineEdit_NotBlank_Validator(QLineEditor_Abstract_Validator):
     # TDDO add field names to error messages?
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QLineEdit_NotBlank_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def isValid(self):
         """ The field is valid if:
@@ -326,14 +326,14 @@ class QListWidget_NotEmpty_Validator(QWidget_Abstract_Validator):
     __DEFAULT_MESSAGE = 'The highlighted list may not be empty.'
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QListWidget_NotEmpty_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def connect(self, widget):
         """ Connect the QListWidget widget to the validator.
         """
         assert(isinstance(widget, QListWidget))
 
-        super(QListWidget_NotEmpty_Validator, self).connect(widget)
+        super().connect(widget)
 
     def isValid(self):
         """ The field is valid if:
@@ -371,14 +371,14 @@ class QComboBox_NotEmpty_Validator(QWidget_Abstract_Validator):
     __DEFAULT_MESSAGE = 'The list must have something selected.'
 
     def __init__(self, widget, title=_DEFAULT_TITLE, message=__DEFAULT_MESSAGE):
-        super(QComboBox_NotEmpty_Validator, self).__init__(widget, title, message)
+        super().__init__(widget, title, message)
 
     def connect(self, widget):
         """ Connect the QLineEdit widget to the validator.
         """
         assert(isinstance(widget,  QComboBox))
 
-        super(QComboBox_NotEmpty_Validator, self).connect(widget)
+        super().connect(widget)
 
     def isValid(self):
         """ The field is valid if:
@@ -409,12 +409,12 @@ class QComboBox_NotEmpty_Validator(QWidget_Abstract_Validator):
 
         return False
 
-class WidgetValidators(MutableSequence):
+class WidgetValidatorList(MutableSequence):
     """ Contains a list widget validators.
     """
 
     def __init__(self):
-        super(WidgetValidators, self).__init__()
+        super().__init__()
 
         self.validators = []
 
@@ -427,7 +427,7 @@ class WidgetValidators(MutableSequence):
         return self.validators[idx]
 
     def __setitem__(self, idx, obj):
-        assert(isinstance(obj, AbstractWidgetValidator))
+        assert(isinstance(obj, QWidget_Abstract_Validator))
 
         self.validators[idx] = obj
 
@@ -438,7 +438,7 @@ class WidgetValidators(MutableSequence):
         return len(self.validators)
 
     def insert(self, idx, obj):
-        assert(isinstance(obj, AbstractWidgetValidator))
+        assert(isinstance(obj, QWidget_Abstract_Validator))
 
         self.validators.insert(idx, obj)
     # ==========================================================================
