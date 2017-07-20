@@ -17,6 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path, sys, unicodedata
+from collections import MutableSequence
+from functools import reduce
+
 if (sys.platform == 'win32'):
     from win32api import GetVolumeInformation
 
@@ -28,6 +31,8 @@ BAD_FILENAME_CHARACTERS = "|^?*<>[]=+\"\\/,:;"
 #         and Python doesn't allow them to be passed by reference.
 #     """
 #     pass
+
+
 
 def NormalizeFileName(filename):
     """Clean up the file name by replacing or deleting bad characters."""
@@ -56,15 +61,78 @@ def GetVolumeLabel(path):
     drive, tail = os.path.splitdrive(self.dirpickerctrlSource.GetPath().strip())
     return GetVolumeInformation(drive)[0]
 
+def toHex(s):
+    lst = []
+    for ch in s:
+        hv = hex(ord(ch)).replace('0x', '')
+        if len(hv) == 1:
+            hv = '0'+hv
+        lst.append(hv)
+
+    return reduce(lambda x,y:x+y, lst)
+
 def TimedeltaToString(td, noZeroDays=True):
     """ Based on an answer found ton stackoverflow.
     """
     if (td.days > 0):
-        out = str(td).replace(" days, ", ":")
+        out = str(td).replace(' days, ', ':')
     else:
-        if (not noZeroDays):
-            out = "0:" + str(td)
+        if (noZeroDays):
+            out = str(td)
+        else:
+            out = '0:' + str(td)
+
     outAr = out.split(':')
-    outAr = ["%02d" % (int(float(x))) for x in outAr]
-    out   = ":".join(outAr)
+    outAr = ['%02d' % (int(float(x))) for x in outAr]
+    out   = ':'.join(outAr)
+
     return out
+
+class TemporaryFilesList(MutableSequence):
+    """ Contains a list of temporary files.
+
+        The temporary files will be deleted when the unlink() method is called
+        or when the object destructor is called.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.temporaryFilenames = []
+
+    def __del__(self):
+        self.unlink()
+
+    # MutableSequence abstract methods
+    # ==========================================================================
+    def __getitem__(self, idx):
+        return self.temporaryFilenames[idx]
+
+    def __setitem__(self, idx, obj):
+        self.temporaryFilenames[idx] = obj
+
+    def __delitem__(self, idx):
+        del self.temporaryFilenames[idx]
+
+    def __len__(self):
+        return len(self.temporaryFilenames)
+
+    def insert(self, idx, obj):
+        self.temporaryFilenames.insert(idx, obj)
+    # ==========================================================================
+
+    def clear(self):
+        """ Remove all the file names from the list.  The files will not be
+            deleted.
+        """
+        del self.temporaryFilenames[:]
+
+    def unlink(self):
+        """ Delete all of the temporary files in the list then clear the list.
+        """
+        for temporaryFilename in self.temporaryFilenames:
+            try:
+                os.unlink(temporaryFilename)
+            except:
+                pass
+
+        self.clear()

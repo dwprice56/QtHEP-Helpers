@@ -18,8 +18,21 @@
 
 import os.path, sys
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (
+    Qt,
+    QProcess
+    )
+
 from PyQt5.QtWidgets import QTableWidgetItem
+
+ProcessErrors = {
+    QProcess.FailedToStart: "Failed to start",
+    QProcess.Crashed: "Crashed",
+    QProcess.Timedout: "Timedout",
+    QProcess.WriteError: "Write error",
+    QProcess.ReadError: "Read error",
+    QProcess.UnknownError: "Unknown error"
+}
 
 def AddItemToTableWidgetCell(tableWidget, row, column, value, data=None,
     readOnly=False, textAlignment=(Qt.AlignRight | Qt.AlignBottom)):
@@ -64,9 +77,16 @@ def UpdateComboBox(comboBox, stringList):
     """ Updates the list of items in a QComboBox, preserving the current selection
         (if possible).
     """
-
     currentText = comboBox.currentText()
     comboBox.clear()
     comboBox.addItems(stringList)
     if (currentText in stringList):
         comboBox.setCurrentText(currentText)
+
+def TranslateProcessError(error):
+    """ Translate the process error code to text.
+    """
+    if (error in ProcessErrors):
+        return ProcessErrors[error]
+
+    return 'Unknown error code {}'.format(error)
