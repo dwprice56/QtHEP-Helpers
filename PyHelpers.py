@@ -16,12 +16,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os.path, sys, unicodedata
+import os.path, datetime, sys, unicodedata
 from collections import MutableSequence
 from functools import reduce
 
 if (sys.platform == 'win32'):
-    from win32api import GetVolumeInformation
+    import win32api
+    import win32com
+    import win32process
 
 BAD_FILENAME_CHARACTERS = "|^?*<>[]=+\"\\/,:;"
 
@@ -48,18 +50,61 @@ def NormalizeFileName(filename):
 
     return cleanFilename
 
-def GetVolumeLabel(path):
-    """ Returns the volume label for a given path.
+def GetVolumeLabel(folder):
+    """ Get the volume label for the disk where the folder is located.
 
-        This only works under Windows.  Linux does really have disk volumes, so
-        it doesn't have volume labels.  An RuntimeError is raised if this
-        function is called and the platform is not 'win32'.
+        Windows drives may or may not have volume labels.  If we're running on
+        Windows and the drive has a volume label, use it.
+
+        If we're not running on Windows, or if the drive does not have a label,
+        look for a ".volumeLabel" file in the folder (if present).  If it's not
+        there, look for it one folder level up.  When/if it's found, read the
+        first line and use that as the volume label.
     """
-    if (sys.platform != 'win32'):
-        raise RuntimeError('Method GetVolueLabel(path) was called but the OS is not Windows.')
+    volumeLabel = ''
+    if (sys.platform == 'win32'):
+        drive, tail = os.path.splitdrive(folder.strip())
+        volumeLabel = win32api.GetVolumeInformation(drive)[0]
 
-    drive, tail = os.path.splitdrive(self.dirpickerctrlSource.GetPath().strip())
-    return GetVolumeInformation(drive)[0]
+    if (not volumeLabel):
+        volumeLabelFilename = os.path.join(folder, '.volumelabel')
+        if (not os.path.exists(volumeLabelFilename)):
+            head, tail = os.path.split(folder)
+            if (head):
+                volumeLabelFilename = os.path.join(head, '.volumelabel')
+                if (not os.path.exists(volumeLabelFilename)):
+                    volumeLabelFilename = ''
+            else:
+                volumeLabelFilename = ''
+
+    if (volumeLabelFilename):
+        with open(volumeLabelFilename, 'r') as f:
+            volumeLabel = f.readline().strip()
+
+    return volumeLabel
+
+def LogTimestamp(microsecond=False):
+    """ Returns a timestamp string suitable for use in a log. """
+
+    if (microsecond):
+        return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+
+    return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+if (sys.platform == 'win32'):
+    def SetProcessPriority(pid, priority=win32process.BELOW_NORMAL_PRIORITY_CLASS):
+        """ Set a process to run in the background.  This only works on windows.
+        """
+        try:
+            processHandle = win32api.OpenProcess(win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_SET_INFORMATION, False, pid)
+            win32process.SetPriorityClass(processHandle, priority)
+        except:
+            pass
+else:
+    def SetProcessPriority(pid, priority):
+        """ This is a dummy function for *nix systems.
+        """
+        pass
 
 def toHex(s):
     lst = []
@@ -72,7 +117,7 @@ def toHex(s):
     return reduce(lambda x,y:x+y, lst)
 
 def TimedeltaToString(td, noZeroDays=True):
-    """ Based on an answer found ton stackoverflow.
+    """ Based on an answer found on stackoverflow.
     """
     if (td.days > 0):
         out = str(td).replace(' days, ', ':')
