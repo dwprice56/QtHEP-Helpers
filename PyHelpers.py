@@ -133,6 +133,28 @@ def TimedeltaToString(td, noZeroDays=True):
 
     return out
 
+class ElapsedTime():
+    """ Contains an expireable elapsed time.
+    """
+
+    def __init__(self, expiresAfter=datetime.timedelta(hours=1)):
+        self.startTime = datetime.datetime.now()
+        self.expiresAfter = expiresAfter
+
+    def __str__(self):
+        return TimedeltaToString(self.elapsedTime)
+
+    @property
+    def elapsedTime(self):
+        return (datetime.datetime.now() - self.startTime)
+
+    @property
+    def expired(self):
+        return (self.elapsedTime >= self.expiresAfter)
+
+    def restart(self):
+        self.startTime = datetime.datetime.now()
+
 class TemporaryFilesList(MutableSequence):
     """ Contains a list of temporary files.
 
